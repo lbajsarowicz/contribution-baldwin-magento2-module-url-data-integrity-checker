@@ -133,7 +133,7 @@ class DuplicateUrlKeyTest extends TestCase
     }
 
     /**
-     * @return array<array<array<array<string, mixed>>>>
+     * @return array<array<array<array<string, int|string>>>>
      */
     public static function duplicatedProductUrlKeyValuesDataProvider(): array
     {
