@@ -13,18 +13,23 @@ use Magento\Catalog\Model\Attribute\ScopeOverriddenValueFactory as AttributeScop
 use Magento\Catalog\Model\ResourceModel\Product\Collection as ProductCollection;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory as ProductCollectionFactory;
 use Magento\Framework\DataObject;
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class DuplicateUrlKeyTest extends TestCase
 {
+    public function testDuplicatedProductUrlKeyValues(): void
+    {
+        foreach (self::duplicatedProductUrlKeyValuesDataProvider() as [$dbData, $expectedResults]) {
+            $this->assertDuplicatedProductUrlKeyValues($dbData, $expectedResults);
+        }
+    }
+
     /**
      * @param array<array<string, int|string>> $dbData
      * @param array<array<string, int|string>> $expectedResults
      */
-    #[DataProvider('duplicatedProductUrlKeyValuesDataProvider')]
-    public function testDuplicatedProductUrlKeyValues(array $dbData, array $expectedResults): void
+    private function assertDuplicatedProductUrlKeyValues(array $dbData, array $expectedResults): void
     {
         $dbData = array_map(function ($productData): DataObject {
             return new DataObject($productData);
@@ -32,7 +37,7 @@ class DuplicateUrlKeyTest extends TestCase
 
         $storeIds = array_unique(
             array_map(function ($productData): int {
-                assert(is_int($productData->getStoreId()));
+                $this->assertIsInt($productData->getStoreId());
                 return $productData->getStoreId();
             }, $dbData)
         );
