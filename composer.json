@@ -24,8 +24,12 @@
     },
     "require-dev": {
         "bamarni/composer-bin-plugin": "^1.7",
+        "bitexpert/phpstan-magento": "^0.44",
         "ergebnis/composer-normalize": "^2.17",
+        "magento/magento-coding-standard": "^41",
         "mikey179/vfsstream": "^1.6",
+        "phpstan/extension-installer": "^1.4",
+        "phpstan/phpstan": "^2.1",
         "phpunit/phpunit": "^12.5"
     },
     "repositories": [
@@ -46,7 +50,9 @@
         "allow-plugins": {
             "bamarni/composer-bin-plugin": true,
             "ergebnis/composer-normalize": true,
-            "magento/composer-dependency-version-audit-plugin": true
+            "magento/composer-dependency-version-audit-plugin": true,
+            "dealerdirect/phpcodesniffer-composer-installer": true,
+            "phpstan/extension-installer": true
         },
         "sort-packages": true
     },

@@ -11,10 +11,14 @@ use Magento\Framework\TestFramework\Unit\Autoloader\ExtensionAttributesInterface
 use Magento\Framework\TestFramework\Unit\Autoloader\FactoryGenerator;
 use Magento\Framework\TestFramework\Unit\Autoloader\GeneratedClassesAutoloader;
 
-$generatorIo = new Io(
-    new File(),
-    org\bovigo\vfs\vfsStream::setup('my_generated_classes')->url()
-);
+$fileDriver = new File();
+$generatedCodeDirectory = sys_get_temp_dir() . '/baldwin-generated-classes-' . uniqid('', true);
+register_shutdown_function(function () use ($fileDriver, $generatedCodeDirectory): void {
+    if ($fileDriver->isDirectory($generatedCodeDirectory)) {
+        $fileDriver->deleteDirectory($generatedCodeDirectory);
+    }
+});
+$generatorIo = new Io($fileDriver, $generatedCodeDirectory);
 $generatedCodeAutoloader = new GeneratedClassesAutoloader(
     [
         new ExtensionAttributesGenerator(),

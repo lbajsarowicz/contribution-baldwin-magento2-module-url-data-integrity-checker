@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Baldwin\UrlDataIntegrityChecker\Test\Storage;
 
 use Baldwin\UrlDataIntegrityChecker\Storage\CacheStorage;
-use Magento\Framework\App\Cache as AppCache;
+use Magento\Framework\App\CacheInterface;
 use PHPUnit\Framework\TestCase;
 
 class CacheStorageTest extends TestCase
@@ -19,8 +19,7 @@ class CacheStorageTest extends TestCase
         ];
 
         $cacheMock = $this
-            ->getMockBuilder(AppCache::class)
-            ->disableOriginalConstructor()
+            ->getMockBuilder(CacheInterface::class)
             ->getMock();
 
         $cacheMock->expects($this->once())
@@ -56,21 +55,16 @@ class CacheStorageTest extends TestCase
         ];
 
         $cacheMock = $this
-            ->getMockBuilder(AppCache::class)
-            ->disableOriginalConstructor()
+            ->getMockBuilder(CacheInterface::class)
             ->getMock();
 
-        $matcher = $this->exactly(2);
-        $cacheMock->expects($matcher)
+        $expectedWrites = [$existingData, $expectedData];
+        $cacheMock->expects($this->exactly(2))
             ->method('save')
-            // replacement for withConsecutive,
-            // using https://github.com/sebastianbergmann/phpunit/issues/4026#issuecomment-1556763479
-            ->willReturnCallback(function (string $param) use ($matcher, $existingData, $expectedData) {
-                match ($matcher->numberOfInvocations()) {
-                    1       => $this->assertEquals($param, $this->jsonEncode($existingData)),
-                    2       => $this->assertEquals($param, $this->jsonEncode($expectedData)),
-                    default => throw new \LogicException('unexpected amount of calls'),
-                };
+            ->willReturnCallback(function (string $param) use (&$expectedWrites): bool {
+                $expectedWrite = array_shift($expectedWrites);
+                $this->assertIsArray($expectedWrite);
+                $this->assertEquals($this->jsonEncode($expectedWrite), $param);
 
                 return true;
             });
@@ -79,7 +73,7 @@ class CacheStorageTest extends TestCase
             ->method('load')
             ->willReturn(
                 $this->jsonEncode($existingData),
-                $this->jsonEncode($expectedData),
+                $this->jsonEncode($expectedData)
             );
 
         $cacheStorage = new CacheStorage($cacheMock);
@@ -100,21 +94,16 @@ class CacheStorageTest extends TestCase
         $expectedData = [];
 
         $cacheMock = $this
-            ->getMockBuilder(AppCache::class)
-            ->disableOriginalConstructor()
+            ->getMockBuilder(CacheInterface::class)
             ->getMock();
 
-        $matcher = $this->exactly(2);
-        $cacheMock->expects($matcher)
+        $expectedWrites = [$existingData, $expectedData];
+        $cacheMock->expects($this->exactly(2))
             ->method('save')
-            // replacement for withConsecutive,
-            // using https://github.com/sebastianbergmann/phpunit/issues/4026#issuecomment-1556763479
-            ->willReturnCallback(function (string $param) use ($matcher, $existingData, $expectedData) {
-                match ($matcher->numberOfInvocations()) {
-                    1       => $this->assertEquals($param, $this->jsonEncode($existingData)),
-                    2       => $this->assertEquals($param, $this->jsonEncode($expectedData)),
-                    default => throw new \LogicException('unexpected amount of calls'),
-                };
+            ->willReturnCallback(function (string $param) use (&$expectedWrites): bool {
+                $expectedWrite = array_shift($expectedWrites);
+                $this->assertIsArray($expectedWrite);
+                $this->assertEquals($this->jsonEncode($expectedWrite), $param);
 
                 return true;
             });
